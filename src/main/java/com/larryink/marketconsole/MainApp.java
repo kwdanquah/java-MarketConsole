@@ -1,6 +1,7 @@
 package com.larryink.marketconsole;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import javafx.application.Application;
@@ -27,7 +28,7 @@ public class MainApp extends Application {
     private TableColumn askCol;
     private TableColumn askQtyCol;
 
-    private final Executor executor = Executors.newCachedThreadPool(new ThreadFactory() {
+    private final ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(r);
@@ -42,19 +43,19 @@ public class MainApp extends Application {
         table.setItems(data);
 
         bidQtyCol = new TableColumn("BidQty");
-        bidQtyCol.setMinWidth(80);
+        bidQtyCol.setMinWidth(60);
         bidQtyCol.setCellValueFactory(new PropertyValueFactory<>("bidQty"));
 
         bidCol = new TableColumn("Bid");
-        bidCol.setMinWidth(80);
+        bidCol.setMinWidth(60);
         bidCol.setCellValueFactory(new PropertyValueFactory<>("bid"));
 
         askCol = new TableColumn("Ask");
-        askCol.setMinWidth(80);
+        askCol.setMinWidth(60);
         askCol.setCellValueFactory(new PropertyValueFactory<>("ask"));
 
         askQtyCol = new TableColumn("AskQty");
-        askQtyCol.setMinWidth(80);
+        askQtyCol.setMinWidth(60);
         askQtyCol.setCellValueFactory(new PropertyValueFactory<>("askQty"));
 
         table.getColumns().addAll(bidQtyCol, bidCol, askCol, askQtyCol);
@@ -65,19 +66,15 @@ public class MainApp extends Application {
         primaryStage.setScene(new Scene(root, 400, 250));
         primaryStage.show();
 
-        JmsReceiver mdReciever = new JmsReceiver("tcp://localhost:61616", data);
+        JmsReceiver mdReciever = new JmsReceiver("tcp://localhost:61616", data, 10);
         mdReciever.init();
         executor.execute(mdReciever);
     }
-
-    /**
-     * The main() method is ignored in correctly deployed JavaFX application.
-     * main() serves only as fallback in case the application can not be
-     * launched through deployment artifacts, e.g., in IDEs with limited FX
-     * support. NetBeans ignores main().
-     *
-     * @param args the command line arguments
-     */
+    
+    @Override
+    public void stop(){
+        executor.shutdown();        
+    }
     public static void main(String[] args) {
         launch(args);
     }

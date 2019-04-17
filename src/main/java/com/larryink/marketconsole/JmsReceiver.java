@@ -5,61 +5,125 @@
  */
 package com.larryink.marketconsole;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.larryink.marketplacetypes.BookEntry;
+import com.larryink.marketplacetypes.MarketDepth;
+import static java.lang.Integer.min;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import javafx.collections.ObservableList;
 import javax.jms.Connection;
-import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQTextMessage;
 
 /**
  *
  * @author kyere
  */
-public class JmsReceiver implements Runnable{
-    
+public class JmsReceiver implements Runnable {
+
     private ConnectionFactory connectionFactory;
     private Connection connection;
     private Session session;
-    private Queue queue;
+    private Topic topic;
     private MessageConsumer consumer;
-    private ObservableList<DataRow>  data;
-        
-    public JmsReceiver(final String url, ObservableList<DataRow> data){
+    private ObservableList<DataRow> data;
+    private Gson gson;
+    private int depth;
+
+    public JmsReceiver(final String url, ObservableList<DataRow> data, int depth) {
         this.connectionFactory = new ActiveMQConnectionFactory(url);
-        this.data = data;
+        this.data = data;  
+        this.depth = depth;
     }
-        
-    public void init(){
-        try{
+
+    public void init() {
+        try {
             connection = connectionFactory.createConnection();
-            session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
-            queue = session.createQueue("MKT_DATA");
-            consumer = session.createConsumer(queue);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            topic = session.createTopic("MKT_DATA");
+            consumer = session.createConsumer(topic);
             connection.start();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }                                
-    }
+        }
         
+        this.gson = new GsonBuilder().registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+            @Override
+            public Date deserialize(JsonElement jsonElement, java.lang.reflect.Type type, JsonDeserializationContext jdc) throws JsonParseException {
+                return new Date(jsonElement.getAsJsonPrimitive().getAsLong());
+            }
+        }).create();
+        
+        for(int idx = 0; idx < depth; ++idx){
+            data.add(new DataRow("-", "-", "-", "-"));
+        }
+    }
+
     @Override
     public void run() {
         boolean stopped = false;
         while (!stopped) {
-            try{
-                TextMessage textMsg = (TextMessage) consumer.receive();
-                System.out.println(textMsg);
-                System.out.println("Received: " + textMsg.getText());
-                data.add(new DataRow("100", "12.04", "13.63", "200"));
-                if (textMsg.getText().equals("END")) {
-                    break;
-                }
-            }catch(Exception e){
+            try {
+                Message message = consumer.receive();
+                ActiveMQTextMessage textMessage = (ActiveMQTextMessage) message;
+                String json = textMessage.getText();
+                System.out.println(json);
+                MarketDepth md = gson.fromJson(textMessage.getText(), MarketDepth.class);
+                updateData(md);
+            } catch (Exception e) {
                 e.printStackTrace();
-                stopped=true;
             }
         }
+        
+        try {
+            connection.close();
+        } catch (JMSException e) {
+        }    
     }
+    
+    private void updateData(MarketDepth md){
+        ArrayList<DataRow> newData = new ArrayList();
+        //newData.addAll(data);
+        newData.addAll(data);
+        List<BookEntry> bids = md.getBuyDepth();
+        int idx=0;
+        int endIdx = min(bids.size(),depth);
+        for(; idx<endIdx; ++idx){
+            newData.get(idx).setBid(bids.get(idx).getPrice());
+            newData.get(idx).setBidQty(bids.get(idx).getShares());
+        }
+        for(idx=endIdx;idx<depth; ++idx){
+            newData.get(idx).setBid("-");
+            newData.get(idx).setBidQty("-");
+        }
+        
+        List<BookEntry> asks = md.getSellDepth();
+        idx = 0;
+        endIdx = min(asks.size(),depth);
+        for(; idx<endIdx; ++idx){
+            newData.get(idx).setAsk(asks.get(idx).getPrice());
+            newData.get(idx).setAskQty(asks.get(idx).getShares());
+        }
+        for(idx=endIdx;idx<depth; ++idx){
+            newData.get(idx).setAsk("-");
+            newData.get(idx).setAskQty("-");
+        }
+        
+        data.clear();
+        data.addAll(newData);
+    }
+    
 }
