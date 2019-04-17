@@ -7,18 +7,22 @@ package com.larryink.marketconsole;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class DataRow {
+public class BookDataRow {
 
     private SimpleStringProperty bidQty;
     private SimpleStringProperty bid;
+    private SimpleStringProperty bidWho;
     private SimpleStringProperty ask;
     private SimpleStringProperty askQty;
+    private SimpleStringProperty askWho;
 
-    public DataRow(String bidQty, String bid, String ask, String askQty) {
+    public BookDataRow(String bidWho,String bidQty, String bid, String ask, String askQty, String askWho) {
         this.bidQty = new SimpleStringProperty(bidQty);
         this.bid = new SimpleStringProperty(bid);
+        this.bidWho = new SimpleStringProperty(bidWho);
         this.ask = new SimpleStringProperty(ask);
         this.askQty = new SimpleStringProperty(askQty);
+        this.askWho = new SimpleStringProperty(askWho);
     }
 
     public void setBidQty(SimpleStringProperty bidQty) {
@@ -43,6 +47,14 @@ public class DataRow {
     
     public void setBid(String bid) {
         this.bid = new SimpleStringProperty(bid);
+    }
+    
+    public void setBidWho(SimpleStringProperty bidWho) {
+        this.bidWho = bidWho;
+    }
+    
+    public void setBidWho(String bidWho) {
+        this.bidWho = new SimpleStringProperty(bidWho);
     }
 
     public void setAsk(SimpleStringProperty ask) {
@@ -69,6 +81,14 @@ public class DataRow {
         this.askQty = new SimpleStringProperty(askQty);
     }
     
+    public void setAskWho(SimpleStringProperty askWho) {
+        this.askWho = askWho;
+    }
+    
+    public void setAskWho(String askWho) {
+        this.askWho = new SimpleStringProperty(askWho);
+    }    
+    
     public String getBidQty() {
         return bidQty.get();
     }
@@ -77,12 +97,20 @@ public class DataRow {
         return bid.get();
     }
     
+    public String getBidWho() {
+        return bidWho.get();
+    }
+    
     public String getAsk() {
         return ask.get();
     }
     
     public String getAskQty() {
         return askQty.get();
+    }
+    
+    public String getAskWho() {
+        return askWho.get();
     }
 
 }
