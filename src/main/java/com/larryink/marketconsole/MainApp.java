@@ -124,10 +124,12 @@ public class MainApp extends Application implements MarketDataListener {
     
     @Override
     public void stop(){
+        mdReciever.close();
         executor.shutdown();        
     }
     public static void main(String[] args) {
         launch(args);
+        System.out.println("Application Exiting...");
     }
 
     @Override
