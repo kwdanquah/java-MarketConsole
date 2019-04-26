@@ -24,6 +24,15 @@ public class BookDataRow {
         this.askQty = new SimpleStringProperty(askQty);
         this.askWho = new SimpleStringProperty(askWho);
     }
+    
+    public BookDataRow() {
+        this.bidQty = new SimpleStringProperty("");
+        this.bid = new SimpleStringProperty("");
+        this.bidWho = new SimpleStringProperty("");
+        this.ask = new SimpleStringProperty("");
+        this.askQty = new SimpleStringProperty("");
+        this.askWho = new SimpleStringProperty("");
+    }
 
     public void setBidQty(SimpleStringProperty bidQty) {
         this.bidQty = bidQty;

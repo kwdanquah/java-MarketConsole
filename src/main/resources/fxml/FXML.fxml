@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="493.0" prefWidth="784.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+  <children>
+    <TableView layoutX="6.0" layoutY="5.0" prefHeight="274.0" prefWidth="292.0">
+      <columns>
+        <TableColumn editable="false" maxWidth="2010.0" minWidth="10.0" prefWidth="20.0" resizable="false" sortable="false" text="" />
+        <TableColumn editable="false" maxWidth="60.0" minWidth="10.0" prefWidth="60.0" resizable="false" sortable="false" text="BidQty" />
+        <TableColumn editable="false" maxWidth="60.0" minWidth="10.0" prefWidth="60.0" resizable="false" sortable="false" text="Bid" />
+        <TableColumn editable="false" maxWidth="60.0" minWidth="10.0" prefWidth="60.0" resizable="false" sortable="false" text="Ask" />
+        <TableColumn editable="false" maxWidth="60.0" minWidth="10.0" prefWidth="60.0" resizable="false" sortable="false" text="AskQty" />
+        <TableColumn editable="false" maxWidth="64.0" minWidth="10.0" prefWidth="20.0" resizable="false" sortable="false" text="" />
+      </columns>
+    </TableView>
+    <TableView layoutX="246.0" layoutY="279.0" prefHeight="200.0" prefWidth="456.0">
+      <columns>
+        <TableColumn maxWidth="75.0" minWidth="10.0" prefWidth="75.0" text="Time" />
+        <TableColumn prefWidth="75.0" text="Symbol" />
+        <TableColumn prefWidth="75.0" text="Buyer" />
+        <TableColumn prefWidth="75.0" text="Seller" />
+        <TableColumn prefWidth="75.0" text="Qty" />
+        <TableColumn prefWidth="75.0" text="Price" />
+      </columns>
+    </TableView>
+    <LineChart id="LineChartNxN" layoutX="348.0" layoutY="5.0" prefHeight="229.99990000000253" prefWidth="353.0">
+      <xAxis>
+        <NumberAxis side="BOTTOM" />
+      </xAxis>
+      <yAxis>
+        <NumberAxis autoRanging="false" lowerBound="90.0" side="LEFT" upperBound="110.0" />
+      </yAxis>
+    </LineChart>
+    <Button layoutX="74.0" layoutY="283.0" mnemonicParsing="false" text="Resume" />
+    <Button layoutX="151.0" layoutY="283.0" mnemonicParsing="false" text="Pause" />
+  </children>
+</AnchorPane>
